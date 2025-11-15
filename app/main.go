@@ -17,11 +17,13 @@ func main() {
 
 	for scanner.Scan() {
 		commands := strings.Split(scanner.Text(), " ")
-		cmd := commands[0]
+		cmd, args := commands[0], commands[1:]
 
 		switch cmd {
 		case "exit":
 			os.Exit(0)
+		case "echo":
+			fmt.Println(strings.Join(args, " "))
 		default:
 			output := fmt.Sprintf("%s: command not found", cmd)
 			fmt.Println(output)
