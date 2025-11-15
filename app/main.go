@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 // Ensures gofmt doesn't remove the "fmt" and "os" imports in stage 1 (feel free to remove this!)
@@ -15,7 +16,8 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {
-		cmd := scanner.Text()
+		commands := strings.Split(scanner.Text(), " ")
+		cmd := commands[0]
 
 		switch cmd {
 		case "exit":
