@@ -45,5 +45,9 @@ func (cr *CommandRegister) Create(cmd string, args []string) (commands.Command, 
 	if cmdFunc, found := cr.commands[cmd]; found {
 		return cmdFunc(args, cr.stdout), nil
 	}
+<<<<<<< HEAD
 	return nil, fmt.Errorf("%s: command not found", cmd)
+=======
+	return nil, fmt.Errorf("%s command not found", cmd)
+>>>>>>> refs/remotes/origin/master
 }
