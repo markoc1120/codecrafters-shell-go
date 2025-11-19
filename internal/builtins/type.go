@@ -2,6 +2,7 @@ package builtins
 
 import (
 	"fmt"
+	"os/exec"
 	"slices"
 
 	"github.com/codecrafters-io/shell-starter-go/internal/commands"
@@ -24,6 +25,8 @@ func (c *TypeCommand) Execute() error {
 	var msg string
 	if found {
 		msg = fmt.Sprintf("%s is a shell builtin", queryCmd)
+	} else if path, err := exec.LookPath(queryCmd); err == nil {
+		msg = fmt.Sprintf("%s is %s", queryCmd, path)
 	} else {
 		msg = fmt.Sprintf("%s: not found", queryCmd)
 	}
