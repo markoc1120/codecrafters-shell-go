@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"maps"
+	"os/exec"
 	"slices"
 
 	"github.com/codecrafters-io/shell-starter-go/internal/builtins"
@@ -44,6 +45,8 @@ func (cr *CommandRegister) Register(cmd string, builtinFunc func(args []string, 
 func (cr *CommandRegister) Create(cmd string, args []string) (commands.Command, error) {
 	if cmdFunc, found := cr.commands[cmd]; found {
 		return cmdFunc(args, cr.stdout), nil
+	} else if _, err := exec.LookPath(cmd); err == nil {
+		return &builtins.ExternalCommand{Cmd: cmd, BaseCommand: commands.BaseCommand{Stdout: cr.stdout}, Args: args}, nil
 	}
 	return nil, fmt.Errorf("%s: command not found", cmd)
 }
