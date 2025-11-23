@@ -9,7 +9,6 @@ import (
 
 type PwdCommand struct {
 	commands.BaseCommand
-	Args []string
 }
 
 func (c *PwdCommand) Execute() error {
