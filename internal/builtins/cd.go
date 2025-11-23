@@ -12,12 +12,24 @@ type CdCommand struct {
 	Args []string
 }
 
+func (c *CdCommand) changeHome() error {
+	val, found := os.LookupEnv("HOME")
+	if found {
+		os.Chdir(val)
+		return nil
+	}
+	return fmt.Errorf("no HOME is defined")
+}
+
 func (c *CdCommand) Execute() error {
 	if len(c.Args) == 0 {
-		return fmt.Errorf("error for now")
+		return c.changeHome()
 	}
+
 	requestedDir := c.Args[0]
-	if err := os.Chdir(requestedDir); err != nil {
+	if requestedDir == "~" {
+		c.changeHome()
+	} else if err := os.Chdir(requestedDir); err != nil {
 		return fmt.Errorf("cd: %s: No such file or directory", requestedDir)
 	}
 	return nil
