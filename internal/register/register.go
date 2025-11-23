@@ -30,6 +30,9 @@ func RegisterBuiltins(register *CommandRegister) {
 	register.Register("echo", func(args []string, stdout io.Writer) commands.Command {
 		return &builtins.EchoCommand{BaseCommand: commands.BaseCommand{Stdout: stdout}, Args: args}
 	})
+	register.Register("pwd", func(args []string, stdout io.Writer) commands.Command {
+		return &builtins.PwdCommand{BaseCommand: commands.BaseCommand{Stdout: stdout}}
+	})
 
 	builtinCmds := slices.Collect(maps.Keys(register.commands))
 	builtinCmds = append(builtinCmds, "type")
