@@ -15,8 +15,7 @@ type CdCommand struct {
 func (c *CdCommand) changeHome() error {
 	val, found := os.LookupEnv("HOME")
 	if found {
-		os.Chdir(val)
-		return nil
+		return os.Chdir(val)
 	}
 	return fmt.Errorf("no HOME is defined")
 }
