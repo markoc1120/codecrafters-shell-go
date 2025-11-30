@@ -13,6 +13,7 @@ type runeTokenClass int
 const (
 	spaceRunes       = " \t\r\n"
 	singleQuoteRunes = "'"
+	doubleQuoteRunes = "\""
 )
 
 // Classes of rune token
@@ -20,12 +21,14 @@ const (
 	unknownRuneClass runeTokenClass = iota
 	spaceRuneClass
 	singleQuoteRuneClass
+	doubleQuoteRuneClass
 )
 
 // tokenizer states
 const (
 	defaultState tokenizerState = iota
 	singleQuoteState
+	doubleQuoteState
 )
 
 type tokenClassifier map[rune]runeTokenClass
@@ -40,6 +43,7 @@ func newDefaultClassifier() tokenClassifier {
 	t := tokenClassifier{}
 	t.addRuneClass(spaceRunes, spaceRuneClass)
 	t.addRuneClass(singleQuoteRunes, singleQuoteRuneClass)
+	t.addRuneClass(doubleQuoteRunes, doubleQuoteRuneClass)
 	return t
 }
 
@@ -67,6 +71,7 @@ func (t *Tokenizer) Next() (string, error) {
 		nextRune, _, err := t.input.ReadRune()
 		nextRuneType := t.classifier.ClassifyRune(nextRune)
 
+		// no more rune
 		if err == io.EOF {
 			if state == singleQuoteState {
 				return "", fmt.Errorf("unclosed single quote")
@@ -86,12 +91,21 @@ func (t *Tokenizer) Next() (string, error) {
 				}
 			case singleQuoteRuneClass:
 				state = singleQuoteState
+			case doubleQuoteRuneClass:
+				state = doubleQuoteState
 			default:
 				argument = append(argument, nextRune)
 			}
 		case singleQuoteState:
 			switch nextRuneType {
 			case singleQuoteRuneClass:
+				state = defaultState
+			default:
+				argument = append(argument, nextRune)
+			}
+		case doubleQuoteState:
+			switch nextRuneType {
+			case doubleQuoteRuneClass:
 				state = defaultState
 			default:
 				argument = append(argument, nextRune)
