@@ -14,6 +14,7 @@ const (
 	spaceRunes       = " \t\r\n"
 	singleQuoteRunes = "'"
 	doubleQuoteRunes = "\""
+	escapeQuoteRunes = "\\"
 )
 
 // Classes of rune token
@@ -22,6 +23,7 @@ const (
 	spaceRuneClass
 	singleQuoteRuneClass
 	doubleQuoteRuneClass
+	escapeQuoteRuneClass
 )
 
 // tokenizer states
@@ -29,6 +31,7 @@ const (
 	defaultState tokenizerState = iota
 	singleQuoteState
 	doubleQuoteState
+	escapeNextRuneState
 )
 
 type tokenClassifier map[rune]runeTokenClass
@@ -44,6 +47,7 @@ func newDefaultClassifier() tokenClassifier {
 	t.addRuneClass(spaceRunes, spaceRuneClass)
 	t.addRuneClass(singleQuoteRunes, singleQuoteRuneClass)
 	t.addRuneClass(doubleQuoteRunes, doubleQuoteRuneClass)
+	t.addRuneClass(escapeQuoteRunes, escapeQuoteRuneClass)
 	return t
 }
 
@@ -93,6 +97,8 @@ func (t *Tokenizer) Next() (string, error) {
 				state = singleQuoteState
 			case doubleQuoteRuneClass:
 				state = doubleQuoteState
+			case escapeQuoteRuneClass:
+				state = escapeNextRuneState
 			default:
 				argument = append(argument, nextRune)
 			}
@@ -110,6 +116,9 @@ func (t *Tokenizer) Next() (string, error) {
 			default:
 				argument = append(argument, nextRune)
 			}
+		case escapeNextRuneState:
+			argument = append(argument, nextRune)
+			state = defaultState
 		}
 	}
 }
