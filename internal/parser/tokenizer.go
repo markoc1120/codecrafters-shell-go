@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"strings"
 )
 
 // internal state
@@ -11,10 +12,11 @@ type tokenizerState int
 type runeTokenClass int
 
 const (
-	spaceRunes       = " \t\r\n"
-	singleQuoteRunes = "'"
-	doubleQuoteRunes = "\""
-	escapeQuoteRunes = "\\"
+	spaceRunes               = " \t\r\n"
+	singleQuoteRunes         = "'"
+	doubleQuoteRunes         = "\""
+	escapeQuoteRunes         = "\\"
+	escapeInDoubleQuoteRunes = "\"\\$`\n"
 )
 
 // Classes of rune token
@@ -32,6 +34,7 @@ const (
 	singleQuoteState
 	doubleQuoteState
 	escapeNextRuneState
+	escapeNextRuneDoubleQuoteState
 )
 
 type tokenClassifier map[rune]runeTokenClass
@@ -113,9 +116,17 @@ func (t *Tokenizer) Next() (string, error) {
 			switch nextRuneType {
 			case doubleQuoteRuneClass:
 				state = defaultState
+			case escapeQuoteRuneClass:
+				state = escapeNextRuneDoubleQuoteState
 			default:
 				argument = append(argument, nextRune)
 			}
+		case escapeNextRuneDoubleQuoteState:
+			state = doubleQuoteState
+			if !strings.ContainsRune(escapeInDoubleQuoteRunes, nextRune) {
+				argument = append(argument, '\\')
+			}
+			argument = append(argument, nextRune)
 		case escapeNextRuneState:
 			argument = append(argument, nextRune)
 			state = defaultState
