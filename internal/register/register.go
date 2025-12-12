@@ -12,39 +12,39 @@ import (
 )
 
 type CommandRegister struct {
-	commands map[string]func(args []string, stdout io.Writer) commands.Command
-	stdout   io.Writer
+	commands map[string]func(args []string, stdout io.WriteCloser) commands.Command
+	stdout   io.WriteCloser
 }
 
-func NewRegister(stdout io.Writer) *CommandRegister {
+func NewRegister(stdout io.WriteCloser) *CommandRegister {
 	return &CommandRegister{
-		commands: make(map[string]func(args []string, stdout io.Writer) commands.Command),
+		commands: make(map[string]func(args []string, stdout io.WriteCloser) commands.Command),
 		stdout:   stdout,
 	}
 }
 
 func RegisterBuiltins(register *CommandRegister) {
-	register.Register("exit", func(args []string, stdout io.Writer) commands.Command {
+	register.Register("exit", func(args []string, stdout io.WriteCloser) commands.Command {
 		return &builtins.ExitCommand{BaseCommand: commands.BaseCommand{Stdout: stdout}}
 	})
-	register.Register("echo", func(args []string, stdout io.Writer) commands.Command {
+	register.Register("echo", func(args []string, stdout io.WriteCloser) commands.Command {
 		return &builtins.EchoCommand{BaseCommand: commands.BaseCommand{Stdout: stdout}, Args: args}
 	})
-	register.Register("pwd", func(args []string, stdout io.Writer) commands.Command {
+	register.Register("pwd", func(args []string, stdout io.WriteCloser) commands.Command {
 		return &builtins.PwdCommand{BaseCommand: commands.BaseCommand{Stdout: stdout}}
 	})
-	register.Register("cd", func(args []string, stdout io.Writer) commands.Command {
+	register.Register("cd", func(args []string, stdout io.WriteCloser) commands.Command {
 		return &builtins.CdCommand{BaseCommand: commands.BaseCommand{Stdout: stdout}, Args: args}
 	})
 
 	builtinCmds := slices.Collect(maps.Keys(register.commands))
 	builtinCmds = append(builtinCmds, "type")
-	register.Register("type", func(args []string, stdout io.Writer) commands.Command {
+	register.Register("type", func(args []string, stdout io.WriteCloser) commands.Command {
 		return &builtins.TypeCommand{BaseCommand: commands.BaseCommand{Stdout: stdout}, Args: args, BuiltinCmds: builtinCmds}
 	})
 }
 
-func (cr *CommandRegister) Register(cmd string, builtinFunc func(args []string, stdout io.Writer) commands.Command) {
+func (cr *CommandRegister) Register(cmd string, builtinFunc func(args []string, stdout io.WriteCloser) commands.Command) {
 	cr.commands[cmd] = builtinFunc
 }
 

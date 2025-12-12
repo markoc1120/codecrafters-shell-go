@@ -1,6 +1,7 @@
 package builtins
 
 import (
+	"os"
 	"os/exec"
 
 	"github.com/codecrafters-io/shell-starter-go/internal/commands"
@@ -15,5 +16,8 @@ type ExternalCommand struct {
 func (c *ExternalCommand) Execute() error {
 	cmd := exec.Command(c.Cmd, c.Args...)
 	cmd.Stdout = c.Stdout
-	return cmd.Run()
+	cmd.Stderr = os.Stderr
+
+	cmd.Run()
+	return nil
 }

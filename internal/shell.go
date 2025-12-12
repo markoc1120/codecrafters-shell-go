@@ -41,5 +41,7 @@ func (sh *MyShell) Run() {
 		if err := cmd.Execute(); err != nil {
 			fmt.Println(err)
 		}
+
+		cmd.CloseFile()
 	}
 }
